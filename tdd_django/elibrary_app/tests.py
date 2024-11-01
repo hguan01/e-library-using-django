@@ -3,6 +3,43 @@ from .models import Catalogue
 from django.urls import reverse
 from django.urls.base import resolve
 from .views import home
+from .forms import AddBookForm
+
+
+class CatalogueTemplateTests(SimpleTestCase):
+
+    def test_homepage_template(self):
+        response = self.client.get(reverse('home'))
+        self.assertTemplateUsed(response, 'home.html')
+
+    def test_homepage_contains_correct_html(self):
+        response = self.client.get(reverse('home'))
+        self.assertContains(response, 'E-library Application')
+
+    def test_hompage_does_not_contain_incorrect_html(self):
+        response = self.client.get(reverse('home'))
+        self.assertNotContains(response, 'Hello World')
+
+class CatalogueFormTests(SimpleTestCase):
+
+    def setUp(self):
+        url = reverse('home')
+        self.response = self.client.get(url)
+
+    def test_book_form(self):
+        form = self.response.context.get('add_book_form')
+        self.assertIsInstance(form, AddBookForm)
+        self.assertContains(self.response, 'csrfmiddlewaretoken')
+
+    def test_bootstrap_class_used_for_default_styling(self):
+        form = self.response.context.get('add_book_form')
+        self.assertIn('class="form-control"', form.as_p())
+
+    def test_book_form_validation_for_blank_items(self):
+        add_book_form = AddBookForm(
+            data={'title': '', 'ISBN': '', 'author': '', 'price': '', 'availability': ''}
+            )
+        self.assertFalse(add_book_form.is_valid())
 
 class ElibraryURLsTest(SimpleTestCase):
 

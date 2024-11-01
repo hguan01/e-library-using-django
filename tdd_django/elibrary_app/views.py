@@ -1,5 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+
+from .forms import AddBookForm
 
 def home(request):
-    return HttpResponse("Hello World!")
+
+    add_book_form = AddBookForm()
+
+    return render(request, 'home.html', {
+        "add_book_form": add_book_form,
+    })
